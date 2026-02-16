@@ -3,11 +3,18 @@ import os
 load_dotenv()
 MOD_PATH = os.getenv("MOD_PATH")
 MODLIST_PATH = os.getenv("MODLIST_PATH")
+LOG_PATH = "debug.log"
 
 import json
 
 with open(f'{MODLIST_PATH}', 'r') as f:
     content = f.read()
+
+open(LOG_PATH, "w").close()
+
+def log_debug(msg: str) -> None:
+    with open(LOG_PATH, "a", encoding="utf-8") as dbug:
+        dbug.write(msg + "\n")
 
 mods = []
 lines = content.split('\n')
@@ -28,34 +35,36 @@ for mod in mods:
         with open(f'{MOD_PATH}{mod}/meta.ini', 'r', encoding="utf-8") as ini:
             ini_content = ini.read()
     except FileNotFoundError as err:
-        print(err, f'{mod} has no meta.ini file')
+        log_debug(f'DEBUGGER:  INFO:     {mod} has no meta.ini file')
         no_ini.append(mod)
         continue
+    log_debug(f'DEBUGGER - INFO:     {mod} has meta.ini file')
 
-    print(f'{mod} has meta.ini file')
     ini_line = ini_content.split('\n')
-    print(ini_line)
     append_dict = {}
+
     for line in ini_line:
-        if ini_line[0] == '[':
-            pass
+        if line.startswith('['):
+            log_debug(f'DEBUGGER - INFO:     passed line:       {line}')
+            continue
+        elif line.startswith('nexusDescription'):
+            key = 'nexusDescription'
+            value = line[(len('nexusDescription')+2)::]
+            append_dict[key] = value
+            log_debug(f'DEBUGGER - INFO:     forced insertion:  {key}: {value}:  ')
+            continue
         else:
             key = None
             try:
                 (key, val) = line.split('=')
-                print(f'successful split:  {key} = {val}')
+                log_debug(f'DEBUGGER - INFO:     successful split:  {key} = {val}')
                 append_dict[key] = val
             except ValueError as err:
-                print(err, f'key has no value, appending with no value')
+                log_debug(f'DEBUGGER - WARNING:  {err}:  skipped value:\n{line}')
                 append_dict[key] = ''
                 pass
 
         mods_dict[mod] = append_dict
-        # print(f'mods_dict = {mods_dict}')
 
 
 print(json.dumps(mods_dict, indent=4))
-# print(f'no_ini\'s: {no_ini}')
-# ini_lines = ini_content.split('\n')
-# for lines in ini_lines:
-#     lines = lines.strip("\n")
