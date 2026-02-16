@@ -15,7 +15,10 @@ def log_debug(msg: str) -> None:
 
 
 def data_import():
-
+    """
+    also updates mod_dict.json\n
+    :return:mod dict
+    """
     # clear debug log
     open(LOG_PATH, "w").close()
 
