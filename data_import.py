@@ -4,6 +4,7 @@ load_dotenv()
 MOD_PATH = os.getenv("MOD_PATH")
 MODLIST_PATH = os.getenv("MODLIST_PATH")
 LOG_PATH = "debug.log"
+MOD_JSON = "mod_dict.json"
 
 import json
 
@@ -67,4 +68,8 @@ for mod in mods:
         mods_dict[mod] = append_dict
 
 
-print(json.dumps(mods_dict, indent=4))
+open(MOD_JSON, "w").close()
+
+with open(f'{MOD_JSON}', 'w') as mod_export:
+    json.dump(mods_dict, mod_export, indent=4)
+
