@@ -1,5 +1,6 @@
 import json
 from nexus_api import NexusModsAPI
+import data_import
 
 request = NexusModsAPI()
 # response = request.get_request_mod_id()
@@ -23,5 +24,7 @@ request = NexusModsAPI()
 # print(json.dumps(request.get_tracked_mods(), indent=4))
 # print(json.dumps(request.post_mod_track(), indent=4))
 # print(json.dumps(request.delete_tracked_mods(), indent=4))
-print(json.dumps(request.get_all_endorsements(), indent=4))
+# print(json.dumps(request.get_all_endorsements(), indent=4))
+
+data_import.data_import()
 
