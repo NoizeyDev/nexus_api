@@ -16,61 +16,80 @@ def log_debug(msg: str) -> None:
 
 def data_import():
 
+    # clear debug log
+    open(LOG_PATH, "w").close()
+
+    #open and capture modlist.txt
     with open(f'{MODLIST_PATH}', 'r') as f:
         content = f.read()
 
-    open(LOG_PATH, "w").close()
-
-    mods = []
     lines = content.split('\n')
+
+    # List for all mods in modlist.txt
+    mods = []
+
     for line in lines:
         line = line.strip("\n")
         if not line:
             continue
-        if line.startswith('+'):
+        if line.startswith('+'):     # active mods are prefixed with a '+', disabled mods and separators are listed with '-'
             mods.append(line[1::])
 
+    # sorted list of mods for ease of search in json
     mods.sort()
+
+    # mods with no ini files are captured - Not currently handled further
     no_ini = []
+
+    # final dictionary to be exported as JSON
     mods_dict = {}
+
     for mod in mods:
 
         try:
             with open(f'{MOD_PATH}{mod}/meta.ini', 'r', encoding="utf-8") as ini:
                 ini_content = ini.read()
-        except FileNotFoundError as err:
+
+        # to catch and pass over mods with no ini files
+        except FileNotFoundError:
             log_debug(f'DEBUGGER:  INFO:     {mod} has no meta.ini file')
             no_ini.append(mod)
             continue
+
         log_debug(f'DEBUGGER - INFO:     {mod} has meta.ini file')
 
         ini_line = ini_content.split('\n')
+
+        # dict for each mod in mods_dict
         append_dict = {}
 
         for line in ini_line:
-            if line.startswith('['):
+            if line.startswith('['):   # category line to be ignored
                 log_debug(f'DEBUGGER - INFO:     passed line:       {line}')
                 continue
+
+            # specific handling of nexus description, as it is a minefield of chars and needs to be inserted manually
             elif line.startswith('nexusDescription'):
                 key = 'nexusDescription'
                 value = line[(len('nexusDescription')+2)::]
                 append_dict[key] = value
                 log_debug(f'DEBUGGER - INFO:     forced insertion:  {key}: {value}:  ')
                 continue
+
             else:
-                key = None
                 try:
                     (key, val) = line.split('=')
                     log_debug(f'DEBUGGER - INFO:     successful split:  {key} = {val}')
                     append_dict[key] = val
                 except ValueError as err:
+                    # currently im only seeing empty lines show up. I could handle them, but I want to see if anything new happens in the future
                     log_debug(f'DEBUGGER - WARNING:  {err}:  skipped value:\n{line}')
-                    append_dict[key] = ''
+                    # append_dict[key] = ''
                     pass
 
             mods_dict[mod] = append_dict
 
-
+    # lear JSON file before writing
     open(MOD_JSON, "w").close()
 
     with open(f'{MOD_JSON}', 'w') as mod_export:
