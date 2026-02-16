@@ -20,7 +20,7 @@ def data_import():
     open(LOG_PATH, "w").close()
 
     #open and capture modlist.txt
-    with open(f'{MODLIST_PATH}', 'r') as f:
+    with open(f'{MODLIST_PATH}', 'r', encoding="utf-8") as f:
         content = f.read()
 
     lines = content.split('\n')
@@ -29,11 +29,11 @@ def data_import():
     mods = []
 
     for line in lines:
-        line = line.strip("\n")
+        line = line.strip()
         if not line:
             continue
         if line.startswith('+'):     # active mods are prefixed with a '+', disabled mods and separators are listed with '-'
-            mods.append(line[1::])
+            mods.append(line[1:])
 
     # sorted list of mods for ease of search in json
     mods.sort()
@@ -68,7 +68,7 @@ def data_import():
                 log_debug(f'DEBUGGER - INFO:     passed line:       {line}')
                 continue
 
-            # specific handling of nexus description, as it is a minefield of chars and needs to be inserted manually
+            # specific handling of nexus description, as it is a minefield of chars and needs to be inserted manually - consider split('=', 1) to handle
             elif line.startswith('nexusDescription'):
                 key = 'nexusDescription'
                 value = line[(len('nexusDescription')+2)::]
@@ -87,13 +87,10 @@ def data_import():
                     # append_dict[key] = ''
                     pass
 
-            mods_dict[mod] = append_dict
+        mods_dict[mod] = append_dict
 
-    # lear JSON file before writing
-    open(MOD_JSON, "w").close()
-
-    with open(f'{MOD_JSON}', 'w') as mod_export:
-        json.dump(mods_dict, mod_export, indent=4)
+    with open(f'{MOD_JSON}', 'w', encoding="utf-8") as mod_export:
+        json.dump(mods_dict, mod_export, indent=4, ensure_ascii=False)
 
 if __name__ == '__main__':
     data_import()
