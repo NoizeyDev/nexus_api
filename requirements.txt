@@ -1,6 +1,13 @@
+anyio==4.12.1
+backoff==2.2.1
 certifi==2026.1.4
 charset-normalizer==3.4.4
+gql==4.0.0
+graphql-core==3.2.7
 idna==3.11
+multidict==6.7.1
+propcache==0.4.1
 python-dotenv==1.2.1
 requests==2.32.5
 urllib3==2.6.3
+yarl==1.22.0

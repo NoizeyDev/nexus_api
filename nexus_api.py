@@ -8,11 +8,12 @@ class NexusModsAPI:
 
     def __init__(self, game='skyrimspecialedition'):
         self.game = game
-        self.mod_id = 266
+        self.mod_id = 171835
         self.period = '1d'
         self.mod_version_id = ''
         self.md5_hash = '60385f7094908527b0823a0497b764b6'
         self.file_id = 661259
+        self.game_id = 1704
 
     #***********    MODS   *************
 
